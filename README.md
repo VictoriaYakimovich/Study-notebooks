@@ -1,1 +1,1 @@
-# python-exercises
+#Some exercises while studying.
