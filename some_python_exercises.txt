@@ -1,0 +1,284 @@
+Задание 1
+Напишите программу, которая ищет наибольший (не равный 1) общий делитель двух чисел, введённых пользователем (num_1, num_2), и выводит его на экран. 
+Если общих делителей нет, выводит на экран "Общих делителей не найдено".
+
+Для проверки используйте num_1 = 1812, num_2 = 2500
+
+#num_1 = int(input())
+#num_2 = int(input())
+num_1 = 1812
+num_2 = 2500
+for c in range(1,num_2+1):
+    if num_1%c==0 and num_2%c==0:
+        maxim=c
+if maxim>1:
+    print(maxim)
+else:
+    print('Общих делителей не найдено')
+
+
+4.8.2. Задание
+Создайте новый датафрейм log_win, в который будут входить только записи, где пользователь выиграл. 
+Посчитайте, сколько таких записей и сохраните в переменной win_count.
+
+log = pd.read_csv("log.csv",header=None)
+log.columns = ['user_id','time', 'bet','win']
+log_win=log[log.win>0]
+win_count=log_win.win.count()
+
+
+
+4.8.3. Задание
+Создайте новый датафрейм sample2, в который будут входить только записи о рабочих младше 30 лет.
+
+sample = pd.read_csv("sample.csv")
+sample2=sample[(sample.Age<30)&(sample.Profession=='Рабочий')]
+
+
+
+4.9.1. Задание
+С помощью функции query найдите тех, у кого ставка меньше 2000, а выигрыш больше 0.
+Сохраните в новый датафрейм log2.
+
+log = pd.read_csv("log.csv",header=None)
+log.columns = ['user_id','time', 'bet','win']
+log2=log.query('bet<2000 & win>0')
+
+
+
+4.10.1. Задание
+Найдите записи, где в городах есть буква «о» и сохраните в переменную sample3.
+
+sample = pd.read_csv("sample.csv")
+sample3=sample[sample.City.str.contains("о", na=False)]
+
+
+4.10.2. Задание
+Найдите записи, где в городах нет буквы "о" и сохраните в переменную sample4.
+
+sample = pd.read_csv("sample.csv")
+sample4=sample[~sample.City.str.contains("о", na=False)]
+
+
+4.10.3. Задание
+Сохраните в переменную new_log датафрейм, из которого удалены записи с ошибкой в поле user_id.
+
+log = pd.read_csv("log.csv",header=None)
+log.columns = ['user_id','time', 'bet','win']
+new_log=log[~log.user_id.str.contains("error", na=False)]
+
+
+Задание 5.4.1
+На практике помимо энтропийного критерия используют индекс Джини
+Реализуйте функцию подсчёта индекса Джини
+
+def compute_gini_impurity(labels):
+    """
+    :arg labels: np.array of shape (n_objects,)
+    
+    :return: gini_impurity: float
+    """
+    _, counts = np.unique(labels, return_counts=True)
+    gini_impurity=0
+    for count in counts:
+        gini_impurity=gini_impurity+(count/np.shape(labels)[0])*(1-(count/np.shape(labels)[0]))
+    return gini_impurity
+
+
+Задание 5.4.2
+Реализуйте функцию подсчёта энтропии.
+
+def compute_entropy(labels):
+    """
+    :arg labels: np.array of shape (n_objects,)
+    
+    :return: entropy: float
+    """ 
+    counts = np.unique(labels, return_counts=True)[1]
+    entropy=0
+    b=np.shape(labels)[0]
+    for count in counts:
+        entropy=entropy-(count/b)*np.log2(count/b)
+    return entropy
+
+
+Задание 5.4.3
+Реализуйте функцию подсчёта Information Gain.
+
+def calculate_information_gain(s0, *args):
+    """
+    Calculates IG for a split s_1, ..., s_k.
+        :arg s0: the whole set, sequence of shape (n_objects,)
+        :arg args: split — a list of sequences, such that s0 = union(s_1, ..., s_k) and
+           for all i, j: intersection(s_i, s_j) = 0
+           
+        :return: information_gain: float
+    """
+    _,counts0 = np.unique(s0, return_counts=True)
+    entropy0=0
+    probs0=counts0/len(s0)
+    for prob in probs0:
+        entropy0=entropy0-prob*np.log2(prob)  
+    
+    entropy_args=0    
+    for arg in args:
+        _,counts = np.unique(arg, return_counts=True)
+        entropy=0
+        probs=counts/len(arg)
+        for prob in probs:
+            entropy=entropy-prob*np.log2(prob)
+        entropy_args=entropy_args+entropy*(len(arg)/len(s0))
+          
+    information_gain=entropy0-entropy_args 
+    
+    return information_gain  
+
+
+Задание 5.4.4
+Реализуйте функцию для выполнения преобразования mean encoding — замены индекса категориального признака на среднее по значениям целевой переменной в обучающей выборке, соответствующим этому индексу. 
+Из функции нужно вернуть Series, в котором каждому коду категории в индексе сопоставляется посчитанная величина из условия задания. 
+Название индекса (аттрибут name) должен быть равен cat_feature.
+
+def compute_mean_encoding(g0, g1):
+    df=pd.DataFrame({'col1':g0, 'col2':g1})
+    s=df['col1'].value_counts()
+    col11=[]
+    col22=[]
+    for i in s.index.sort_values(ascending=True):
+        col11.append(i)
+        col22.append(df[df.col1==i].col2.mean())
+    cat_feature=pd.Series(col22, index=col11, name='cat_feature')
+    return cat_feature
+
+
+Задание 5.7.1
+Реализуйте функцию нахождения самого частого элемента в массиве (голосование)
+
+def get_most_frequent_value(sequence):
+    g=np.unique(sequence)
+    maxk=0
+    for j in g:
+        k=0
+        for i in range (0, len(sequence)):
+            if sequence[i]==j:
+                k=k+1
+        if k>maxk:
+            maxk=k
+            maxj=j
+    return maxj
+
+
+Задание 5.7.2
+Реализуйте функцию, выполняющую бутстреп
+
+def bootstrap(values, new_dataset_size):    
+    """
+    Creates a new dataset from the old one using bootstrap.
+    
+    :arg values: np.array of shape (n_objects, n_features), input objects
+    :arg new_dataset_size: int, number of elements in the resulting array
+    
+    :return: bootstraped_dataset: np.array of shape (new_dataset_size, n_features)
+    """         
+    f=np.random.choice(values, size=new_dataset_size)
+    return f
+
+
+Задание 5.7.3
+Реализуйте функцию для подсчёта произвольной метрики качества классификации из Scikit-Learn (например, f1_score) в режиме out-ot-bag.
+ Для этого воспользуйтесь аттрибутом oob_decision_function_, который появляется в обученном случайном лесе.
+ Он содержит предсказания для всех объектов обучающей выборки — для каждого объекта они получены агрегацией ответов тех деревьев, которые не использовали во время обучения этот конкретный объект.
+
+
+def estimate_oob_metric(forest, metric, y_train):
+    """
+    Computes any classification metric in the out-of-bag mode.
+        :arg forest: Scikit-Learn ensemble model
+        :arg metric: callable with two arguments that returns a float
+        :arg y_train: correct answers on the train set
+
+        :return oob_metric_value: float
+    """         
+    y_pr = np.argmax(forest.oob_decision_function_, axis=1)
+    return metric(y_train, y_pr)
+
+
+Задание 6.3.1
+Реализуйте функцию подсчёта веса алгоритма в AdaBoost 
+
+def compute_alpha(clf, X_train, y_train, object_weights):
+    """
+    Подсчитывает вес классификатора в ансамбле в соответствии с алгоритмом AdaBoost.
+
+    :arg clf: классификатор
+    :arg X_train: признаки из обучающей выборки, X_train.shape == (n_samples, n_features)
+    :arg y_train: ответы из обучающей выборки, y_train.shape == (n_samples,)
+    :arg object_weights: веса объектов обучающей выборки, object_weights.shape == (n_samples,), object_weights.sum() == 1
+
+    :returns alpha: float
+    """
+    b=clf.predict(X_train)
+    N=0
+    for i in range(len(y_train)) :
+        if b[i]!=y_train[i]:
+            N=N+object_weights[i]
+    alpha=0.5*np.log((1-N)/N)
+    return alpha
+
+
+Задание 6.3.2
+Реализуйте функцию обновления весов объектов в AdaBoost
+
+def get_updated_weights(clf, X_train, y_train, object_weights, alpha):
+    """
+    Подсчитывает новые веса объектов в соответствии с алгоритмом AdaBoost.
+
+    :arg clf: классификатор
+    :arg X_train: признаки из обучающей выборки, X_train.shape == (n_samples, n_features)
+    :arg y_train: ответы из обучающей выборки, y_train.shape == (n_samples,)
+    :arg object_weights: веса объектов обучающей выборки, object_weights.shape == (n_samples,), object_weights.sum() == 1
+    :arg alpha: вес классификатора clf в ансамбле 
+
+    :returns new_object_weights: новые веса объектов обучающей выборки, 
+                                 new_object_weights.shape == (n_samples,), new_object_weights.sum() == 1
+    """
+    y_pred= clf.predict(X_train)
+    #new_object_weights = object_weights
+    object_weights[y_pred == y_train] = object_weights[y_pred == y_train]*np.exp(-alpha)
+    object_weights[y_pred != y_train] = object_weights[y_pred != y_train]*np.exp(alpha)
+    new_object_weights=object_weights/object_weights.sum()
+    return new_object_weights
+
+
+Задание 6.5.1
+В скринкасте мы разобрали схему генерации признаков в стекинге, когда для тестовой выборки алгоритм заново переобучался на всей тестовой выборке. 
+Реализуйте схему, когда вместо этого производится агрегация ответов всех обученных на фолдах классификаторов на тестовой выборке при помощи усреднения.
+
+def compute_meta_feature_mean(clf, X_train, X_test, y_train, cv):
+    """
+    Эта функция подсчитывает признаки для мета-классификатора. 
+    Они являются вероятностями классов при решении задачи многоклассовой классификации.
+
+    :arg clf: классификатор
+    :args X_train, y_train: обучающая выборка
+    :arg X_test: признаки тестовой выборки
+    :arg cv: класс, генерирующий фолды (KFold)
+
+    :returns X_meta_train, X_meta_test: новые признаки для обучающей и тестовой выборок
+    """
+    n_classes = len(np.unique(y_train))
+    X_meta_train = np.zeros((len(X_train), n_classes), dtype=np.float32)
+    X_meta_test = np.zeros((len(X_test), n_classes), dtype=np.float32)
+    
+    i = 0
+    for train_fold_index, predict_fold_index in cv.split(X_train):
+        X_fold_train, X_fold_predict = X_train[train_fold_index], X_train[predict_fold_index]
+        y_fold_train = y_train[train_fold_index]
+ 
+        folded_clf = clone(clf)
+        folded_clf.fit(X_fold_train, y_fold_train)
+        X_meta_train[predict_fold_index] = folded_clf.predict_proba(X_fold_predict)
+        X_meta_test = X_meta_test + folded_clf.predict_proba(X_test)
+        i += 1
+ 
+    return X_meta_train, X_meta_test/i
